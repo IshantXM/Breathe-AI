@@ -22,10 +22,11 @@ export const AlertBanner = memo(function AlertBanner({
 
   return (
     <div
-      role="alert"
-      aria-live="assertive"
+      role="region"
+      aria-label="Demo scenario notices"
+      aria-live="polite"
       aria-atomic="false"
-      className="fixed top-20 right-4 left-4 md:left-auto md:w-96 z-50 flex flex-col gap-2.5 pointer-events-none"
+      className="mb-5 grid gap-2.5 sm:grid-cols-2"
     >
       {alerts.slice(0, 2).map((alert) => (
         <div
@@ -55,7 +56,7 @@ export const AlertBanner = memo(function AlertBanner({
                       : 'bg-amber-50 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-500/40'
                   }`}
                 >
-                  {alert.zone}
+                  Demo notice · {alert.zone}
                 </span>
                 <h2 className="font-bold text-sm text-slate-900 dark:text-white mt-1 leading-snug">
                   {alert.headline}

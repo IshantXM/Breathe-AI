@@ -7,7 +7,6 @@
 import type {
   UrbanZone,
   PersonaProfile,
-  DailyRoutinePlan,
   IAQRoomConfig,
   CommunityPledge,
 } from '@/types';
@@ -18,10 +17,14 @@ import {
   DEFAULT_PLEDGES,
 } from '@/lib/constants';
 
-function safeParse<T>(raw: string | null, fallback: T): T {
-  if (!raw) return fallback;
+function readStored<T>(key: string, fallback: T): T {
   try {
-    return JSON.parse(raw) as T;
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    const parsed: unknown = JSON.parse(raw);
+    if (parsed === null || typeof parsed !== typeof fallback) return fallback;
+    if (Array.isArray(fallback) && (!Array.isArray(parsed) || parsed.length === 0 || parsed.some((item) => !item || typeof item !== 'object'))) return fallback;
+    return parsed as T;
   } catch {
     return fallback;
   }
@@ -31,7 +34,6 @@ const STORAGE_KEYS = {
   ZONES: 'breatheway_zones_v1',
   SELECTED_ZONE: 'breatheway_selected_zone_id_v1',
   PERSONA: 'breatheway_active_persona_v1',
-  ROUTINE: 'breatheway_routine_plan_v1',
   ROOMS: 'breatheway_iaq_rooms_v1',
   PLEDGES: 'breatheway_community_pledges_v1',
   LANGUAGE: 'breatheway_language_v1',
@@ -41,7 +43,9 @@ const STORAGE_KEYS = {
 export const storageService = {
   getZones(): UrbanZone[] {
     if (typeof window === 'undefined') return DEFAULT_ZONES;
-    return safeParse<UrbanZone[]>(localStorage.getItem(STORAGE_KEYS.ZONES), DEFAULT_ZONES);
+    const zones = readStored(STORAGE_KEYS.ZONES, DEFAULT_ZONES);
+    return zones.every((zone) => DEFAULT_ZONES.some((demo) => zone.zoneId === demo.zoneId) && Number.isFinite(zone.aqi) && zone.aqi >= 0 && Number.isFinite(zone.pm25) && zone.pm25 >= 0 && Array.isArray(zone.history))
+      ? zones : DEFAULT_ZONES;
   },
 
   saveZones(zones: UrbanZone[]): void {
@@ -55,7 +59,7 @@ export const storageService = {
 
   getSelectedZoneId(): string {
     if (typeof window === 'undefined') return DEFAULT_ZONES[0].zoneId;
-    return safeParse<string>(localStorage.getItem(STORAGE_KEYS.SELECTED_ZONE), DEFAULT_ZONES[0].zoneId);
+    return readStored(STORAGE_KEYS.SELECTED_ZONE, DEFAULT_ZONES[0].zoneId);
   },
 
   saveSelectedZoneId(zoneId: string): void {
@@ -69,7 +73,8 @@ export const storageService = {
 
   getActivePersona(): PersonaProfile {
     if (typeof window === 'undefined') return DEFAULT_PERSONAS[0];
-    return safeParse<PersonaProfile>(localStorage.getItem(STORAGE_KEYS.PERSONA), DEFAULT_PERSONAS[0]);
+    const saved = readStored(STORAGE_KEYS.PERSONA, DEFAULT_PERSONAS[0]);
+    return DEFAULT_PERSONAS.find((persona) => persona.id === saved.id) ?? DEFAULT_PERSONAS[0];
   },
 
   saveActivePersona(persona: PersonaProfile): void {
@@ -81,23 +86,9 @@ export const storageService = {
     }
   },
 
-  getRoutinePlan(): DailyRoutinePlan | null {
-    if (typeof window === 'undefined') return null;
-    return safeParse<DailyRoutinePlan | null>(localStorage.getItem(STORAGE_KEYS.ROUTINE), null);
-  },
-
-  saveRoutinePlan(plan: DailyRoutinePlan): void {
-    if (typeof window === 'undefined') return;
-    try {
-      localStorage.setItem(STORAGE_KEYS.ROUTINE, JSON.stringify(plan));
-    } catch {
-      // Ignored
-    }
-  },
-
   getRooms(): IAQRoomConfig[] {
     if (typeof window === 'undefined') return DEFAULT_ROOMS;
-    return safeParse<IAQRoomConfig[]>(localStorage.getItem(STORAGE_KEYS.ROOMS), DEFAULT_ROOMS);
+    return readStored(STORAGE_KEYS.ROOMS, DEFAULT_ROOMS);
   },
 
   saveRooms(rooms: IAQRoomConfig[]): void {
@@ -111,7 +102,7 @@ export const storageService = {
 
   getPledges(): CommunityPledge[] {
     if (typeof window === 'undefined') return DEFAULT_PLEDGES;
-    return safeParse<CommunityPledge[]>(localStorage.getItem(STORAGE_KEYS.PLEDGES), DEFAULT_PLEDGES);
+    return readStored(STORAGE_KEYS.PLEDGES, DEFAULT_PLEDGES);
   },
 
   savePledges(pledges: CommunityPledge[]): void {

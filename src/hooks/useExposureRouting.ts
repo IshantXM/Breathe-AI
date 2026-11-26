@@ -68,7 +68,7 @@ export function useExposureRouting(): ExposureRoutingReturn {
   }, [lowestExposureResult]);
 
   const routeDistanceKm = useMemo(() => {
-    return lowestExposureResult?.totalDistance || 8.0;
+    return lowestExposureResult?.totalDistance ?? 0;
   }, [lowestExposureResult]);
 
   const modalComparisons = useMemo<TransitRouteComparison[]>(() => {
@@ -82,8 +82,9 @@ export function useExposureRouting(): ExposureRoutingReturn {
       TransitMode.GasCar,
     ];
 
-    return modes.map((mode) => calculateCommuteMetrics(routeDistanceKm, mode, selectedZone.aqi));
-  }, [routeDistanceKm, selectedZone.aqi]);
+    if (routeDistanceKm === 0) return [];
+    return modes.map((mode) => calculateCommuteMetrics(routeDistanceKm, mode, selectedZone.aqi, selectedZone.pm25));
+  }, [routeDistanceKm, selectedZone.aqi, selectedZone.pm25]);
 
   const setOrigin = useCallback((id: string) => {
     setOriginId(id);

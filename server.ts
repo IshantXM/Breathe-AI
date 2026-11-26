@@ -6,16 +6,14 @@
 // Per SECURITY.md, EFFICIENCY.md, and docs/DECISIONS.md ADR-003
 // ============================================================
 
+import 'dotenv/config';
 import express, { type Request, type Response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
-import { insightCache, hashPayload, pruneCache } from './server/cache';
-import { validateZone, validatePersona, sanitizeText } from './server/validators';
-import { helmetMiddleware, corsMiddleware, aiRateLimiter, safeErrorHandler } from './server/middleware';
+import { insightCache, hashPayload, getCachedInsight, setCachedInsight } from './server/cache';
+import { validateZone, validatePersona, SUPPORTED_LANGUAGES } from './server/validators';
+import { helmetMiddleware, corsMiddleware, rejectUnlistedOrigin, aiRateLimiter, safeErrorHandler } from './server/middleware';
 import { getAiRoutineInsights, getEmergencyAdvisoryText } from './server/aiService';
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,6 +23,7 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
 
 // 1. Defensive Middleware Chain
 app.use(helmetMiddleware);
+app.use(rejectUnlistedOrigin);
 app.use(corsMiddleware);
 app.use(express.json({ limit: '15kb' }));
 
@@ -40,7 +39,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
 // 3. Routine Insights Endpoint
 app.post('/api/routine-insights', aiRateLimiter, async (req: Request, res: Response) => {
-  const { persona, zone, language = 'en' } = req.body;
+  const { persona, zone, language = 'en' } = req.body ?? {};
   if (!validateZone(zone)) {
     return res.status(400).json({ error: 'Invalid zone telemetry payload or out-of-range values.' });
   }
@@ -48,41 +47,63 @@ app.post('/api/routine-insights', aiRateLimiter, async (req: Request, res: Respo
     return res.status(400).json({ error: 'Invalid persona profile payload.' });
   }
 
-  const cleanLang = sanitizeText(language, 10) || 'en';
-  const cacheKey = hashPayload({ personaId: persona.id, zoneId: zone.zoneId, aqi: zone.aqi, cleanLang });
+  const cleanLang = typeof language === 'string' && SUPPORTED_LANGUAGES.has(language) ? language : 'en';
+  const cacheKey = hashPayload({
+    personaId: persona.id,
+    zone: {
+      zoneId: zone.zoneId,
+      aqi: zone.aqi,
+      pm25: zone.pm25,
+      pm10: zone.pm10,
+      no2: zone.no2,
+      co: zone.co,
+      o3: zone.o3,
+      temperatureC: zone.temperatureC,
+      windSpeedKmh: zone.windSpeedKmh,
+      inversionRisk: zone.inversionRisk,
+    },
+    language: cleanLang,
+  });
 
-  if (insightCache.has(cacheKey)) {
-    return res.status(200).json(insightCache.get(cacheKey)!.data);
-  }
+  const cachedResult = getCachedInsight(cacheKey);
+  if (cachedResult !== undefined) return res.status(200).json(cachedResult);
 
   const result = await getAiRoutineInsights(persona, zone, cleanLang);
-  pruneCache();
-  insightCache.set(cacheKey, { data: result, cachedAt: Date.now() });
+  setCachedInsight(cacheKey, result);
   return res.status(200).json(result);
 });
 
 // 4. Emergency Advisory Endpoint
 app.post('/api/emergency-advisory', aiRateLimiter, async (req: Request, res: Response) => {
-  const { zone, language = 'en' } = req.body;
+  const { zone, language = 'en' } = req.body ?? {};
   if (!validateZone(zone)) {
     return res.status(400).json({ error: 'Invalid zone telemetry payload.' });
   }
 
-  const cleanLang = sanitizeText(language, 10) || 'en';
-  const cacheKey = hashPayload({ type: 'advisory', zoneId: zone.zoneId, aqi: zone.aqi, cleanLang });
+  const cleanLang = typeof language === 'string' && SUPPORTED_LANGUAGES.has(language) ? language : 'en';
+  const cacheKey = hashPayload({
+    type: 'advisory',
+    zone: {
+      zoneId: zone.zoneId,
+      aqi: zone.aqi,
+      pm25: zone.pm25,
+      inversionRisk: zone.inversionRisk,
+    },
+    language: cleanLang,
+  });
 
-  if (insightCache.has(cacheKey)) {
-    return res.status(200).json({ advisory: insightCache.get(cacheKey)!.data });
-  }
+  const cachedAdvisory = getCachedInsight(cacheKey);
+  if (cachedAdvisory !== undefined) return res.status(200).json({ advisory: cachedAdvisory });
 
   const advisory = await getEmergencyAdvisoryText(zone, cleanLang);
-  pruneCache();
-  insightCache.set(cacheKey, { data: advisory, cachedAt: Date.now() });
+  setCachedInsight(cacheKey, advisory);
   return res.status(200).json({ advisory });
 });
 
 // 5. Static Assets & Express 5 Named Splat Fallback
 const distPath = path.join(__dirname, 'dist');
+app.use('/api', (_req, res) => { res.status(404).json({ error: 'API endpoint not found.' }); });
+app.use('/assets', express.static(path.join(distPath, 'assets'), { immutable: true, maxAge: '1y' }));
 app.use(express.static(distPath));
 
 app.get('*splat', (_req: Request, res: Response) => {

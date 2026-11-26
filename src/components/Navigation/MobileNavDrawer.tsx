@@ -3,7 +3,8 @@
 // Slide-over navigation drawer for mobile form factor
 // ============================================================
 
-import { memo } from 'react';
+import { memo, useRef } from 'react';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 import { TabId, Language, AccessibilityMode, type UrbanZone } from '@/types';
 import { BRANDING } from '@/config/branding';
 import { ShieldLogo, CloseIcon, UserIcon } from '@/components/ui/Icons';
@@ -16,8 +17,7 @@ export interface MobileNavDrawerProps {
   tabs: Array<{ id: TabId; label: string; subtitle: string; icon: React.ReactNode }>;
   selectedZone: UrbanZone;
   aqiColor: string;
-  currentUser: { name: string; role: string } | null;
-  onOpenAuth: () => void;
+  onOpenInfo: () => void;
   language: Language;
   onLanguageChange: (lang: Language) => void;
   accessibilityMode: AccessibilityMode;
@@ -36,13 +36,14 @@ export const MobileNavDrawer = memo(function MobileNavDrawer({
   tabs,
   selectedZone,
   aqiColor,
-  currentUser,
-  onOpenAuth,
+  onOpenInfo,
   language,
   onLanguageChange,
   accessibilityMode,
   onAccessibilityModeChange,
 }: MobileNavDrawerProps) {
+  const drawerRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(drawerRef, isOpen, onClose);
   if (!isOpen) return null;
 
   return (
@@ -55,7 +56,7 @@ export const MobileNavDrawer = memo(function MobileNavDrawer({
       />
 
       {/* Drawer Container */}
-      <div className="relative w-4/5 max-w-sm bg-white dark:bg-[#070b16] h-full shadow-2xl flex flex-col justify-between border-r border-slate-200 dark:border-slate-800 p-5 z-10 overflow-y-auto animate-fadeIn">
+      <div ref={drawerRef} role="dialog" aria-modal="true" aria-label="Navigation menu" className="relative w-4/5 max-w-sm bg-white dark:bg-[#070b16] h-full shadow-2xl flex flex-col justify-between border-r border-slate-200 dark:border-slate-800 p-5 z-10 overflow-y-auto animate-fadeIn">
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-2.5">
@@ -89,7 +90,7 @@ export const MobileNavDrawer = memo(function MobileNavDrawer({
           </div>
 
           {/* Mobile Nav Tabs */}
-          <div className="flex flex-col gap-1.5">
+          <nav aria-label="Workspace sections" className="flex flex-col gap-1.5">
             <div className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-400 font-mono px-1">
               Navigation
             </div>
@@ -98,8 +99,8 @@ export const MobileNavDrawer = memo(function MobileNavDrawer({
               return (
                 <button
                   key={tab.id}
-                  role="tab"
-                  aria-selected={isActive}
+                  type="button"
+                  aria-current={isActive ? 'page' : undefined}
                   onClick={() => onSelectTab(tab.id)}
                   className={`flex items-center gap-3 w-full px-3.5 py-3 min-h-[48px] rounded-xl text-xs font-bold transition-all ${
                     isActive
@@ -114,7 +115,7 @@ export const MobileNavDrawer = memo(function MobileNavDrawer({
                 </button>
               );
             })}
-          </div>
+          </nav>
         </div>
 
         {/* Mobile Drawer Bottom Utilities */}
@@ -123,12 +124,12 @@ export const MobileNavDrawer = memo(function MobileNavDrawer({
             type="button"
             onClick={() => {
               onClose();
-              onOpenAuth();
+             onOpenInfo();
             }}
             className="w-full py-3 min-h-[44px] rounded-xl font-bold text-xs bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-98"
           >
             <UserIcon size={14} />
-            <span>{currentUser ? currentUser.name : 'Open Citizen Portal'}</span>
+            <span>About this demo</span>
           </button>
 
           <div className="grid grid-cols-2 gap-2 text-xs">

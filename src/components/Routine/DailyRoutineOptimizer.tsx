@@ -7,7 +7,8 @@
 import { memo, useState, useCallback } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { apiService } from '@/services/apiService';
-import type { PersonaProfile } from '@/types';
+import type { DailyRoutinePlan, PersonaProfile } from '@/types';
+import { generateRuleBasedRoutine } from '@/lib/routineGuidance';
 import { RoutineTimeline } from './RoutineTimeline';
 import {
   SparklesIcon,
@@ -26,16 +27,15 @@ export const DailyRoutineOptimizer = memo(function DailyRoutineOptimizer() {
     setActivePersona,
     selectedZone,
     language,
-    routinePlan,
-    setRoutinePlan,
   } = useAppContext();
 
+  const scenarioKey = JSON.stringify([activePersona.id, selectedZone.zoneId, selectedZone.lastUpdated, language]);
+  const [result, setResult] = useState<{ key: string; plan: DailyRoutinePlan; offline: boolean } | null>(null);
+  const routinePlan = result?.key === scenarioKey ? result.plan : null;
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleGenerate = useCallback(async () => {
     setIsLoading(true);
-    setErrorMessage(null);
 
     try {
       const plan = await apiService.generateDailyRoutine({
@@ -43,16 +43,13 @@ export const DailyRoutineOptimizer = memo(function DailyRoutineOptimizer() {
         zone: selectedZone,
         language,
       });
-      setRoutinePlan(plan);
-    } catch (err: unknown) {
-      console.error('Failed to generate routine:', err);
-      setErrorMessage(
-        'Unable to generate AI schedule right now. Showing localized heuristic guidance.'
-      );
+      setResult({ key: scenarioKey, plan, offline: false });
+    } catch {
+      setResult({ key: scenarioKey, plan: generateRuleBasedRoutine(activePersona, selectedZone), offline: true });
     } finally {
       setIsLoading(false);
     }
-  }, [activePersona, selectedZone, language, setRoutinePlan]);
+  }, [activePersona, selectedZone, language, scenarioKey]);
 
   return (
     <section
@@ -69,7 +66,7 @@ export const DailyRoutineOptimizer = memo(function DailyRoutineOptimizer() {
                 NEURAL SCHEDULE ENGINE
               </span>
               <span className="text-xs font-mono font-bold text-slate-500 dark:text-slate-400 px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                Gemini 3.1 Flash Lite
+                Optional AI · local fallback
               </span>
             </div>
 
@@ -94,7 +91,7 @@ export const DailyRoutineOptimizer = memo(function DailyRoutineOptimizer() {
                     className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
                     aria-hidden="true"
                   />
-                  <span>Optimizing with Gemini AI…</span>
+                  <span>Generating schedule…</span>
                 </>
               ) : (
                 <>
@@ -171,17 +168,17 @@ export const DailyRoutineOptimizer = memo(function DailyRoutineOptimizer() {
         {/* Screen Reader Announcements */}
         <div aria-live="polite" aria-busy={isLoading} className="sr-only">
           {isLoading
-            ? 'Generating personalized air quality daily schedule with Gemini AI…'
-            : 'Schedule ready.'}
+            ? 'Generating an air quality planning schedule…'
+            : routinePlan ? 'Schedule ready.' : ''}
         </div>
 
-        {errorMessage && (
+        {result?.key === scenarioKey && result.offline && (
           <div
             role="status"
             className="p-4 bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-800 rounded-2xl text-amber-900 dark:text-amber-200 text-xs flex items-center gap-3 relative z-10"
           >
             <AlertTriangleIcon size={16} className="text-amber-600 dark:text-amber-400 shrink-0" />
-            <span className="leading-relaxed">{errorMessage}</span>
+            <span className="leading-relaxed">The service is unavailable. Showing local, rules-based guidance for this demo snapshot.</span>
           </div>
         )}
       </div>
@@ -189,6 +186,10 @@ export const DailyRoutineOptimizer = memo(function DailyRoutineOptimizer() {
       {/* Routine Plan Results */}
       {routinePlan && (
         <div className="flex flex-col gap-8 fade-in">
+          <p role="note" className="text-xs text-slate-700 dark:text-slate-300">
+            Source: {routinePlan.source === 'gemini' ? 'AI-generated draft · verify independently' : 'local rules-based fallback'}.
+            This scenario is not a forecast or medical advice.
+          </p>
           {/* Key Metric Highlights & Optimal Window */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Card 1: Optimal Outdoor Window */}
@@ -199,11 +200,13 @@ export const DailyRoutineOptimizer = memo(function DailyRoutineOptimizer() {
                     <ClockIcon size={14} />
                   </div>
                   <span className="text-[11px] uppercase font-bold tracking-wider text-emerald-800 dark:text-emerald-300">
-                    Optimal Outdoor Activity Window
+                    Outdoor Activity Guidance (Scenario Only)
                   </span>
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-slate-100 font-mono tracking-tight mt-1">
-                  {routinePlan.optimalOutdoorWindow.startHour}:00 – {routinePlan.optimalOutdoorWindow.endHour}:00
+                  {routinePlan.optimalOutdoorWindow.startHour === null || routinePlan.optimalOutdoorWindow.endHour === null
+                    ? 'No window identified'
+                    : `${routinePlan.optimalOutdoorWindow.startHour}:00 – ${routinePlan.optimalOutdoorWindow.endHour}:00`}
                 </div>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-300 mt-4 leading-relaxed">
@@ -224,11 +227,11 @@ export const DailyRoutineOptimizer = memo(function DailyRoutineOptimizer() {
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-sky-700 dark:text-sky-300 font-mono tracking-tight mt-1">
                   {routinePlan.totalExposureScore}{' '}
-                  <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">µg·h</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">µg (rough estimate)</span>
                 </div>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-4 leading-relaxed">
-                Avoiding morning inversion peaks reduces pulmonary particulate intake by ~42%.
+                Illustrative only: assumes 0.6 m³/h for 8 hours at this snapshot's PM2.5, with no filtration.
               </p>
             </div>
 
@@ -244,12 +247,11 @@ export const DailyRoutineOptimizer = memo(function DailyRoutineOptimizer() {
                   </span>
                 </div>
                 <div className="text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-400 font-mono tracking-tight mt-1">
-                  {routinePlan.carbonOffsetKg}{' '}
-                  <span className="text-xs text-slate-500 dark:text-slate-400 font-normal">kg CO₂</span>
+                  {routinePlan.carbonOffsetKg === null ? 'Not measured' : `${routinePlan.carbonOffsetKg} kg CO₂`}
                 </div>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-4 leading-relaxed">
-                Achieved by consolidating errands and shifting peak motorized transit trips.
+                No trip or vehicle data is connected, so the app does not claim carbon savings.
               </p>
             </div>
           </div>

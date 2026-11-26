@@ -64,7 +64,8 @@ function getAdvisory(mode: TransitMode, ambientAQI: number): string {
 export function calculateCommuteMetrics(
   distanceKm: number,
   mode: TransitMode,
-  ambientAQI: number
+  ambientAQI: number,
+  scenarioPm25UgM3?: number,
 ): TransitRouteComparison {
   assertFiniteNumber(distanceKm, 'distanceKm');
   assertFiniteNumber(ambientAQI, 'ambientAQI');
@@ -72,7 +73,7 @@ export function calculateCommuteMetrics(
   if (distanceKm <= 0) throw new RangeError(`Distance must be > 0. Received: ${distanceKm}`);
   if (ambientAQI < 0) throw new RangeError(`AQI cannot be negative. Received: ${ambientAQI}`);
 
-  const pm25UgM3 = Math.max(5, (ambientAQI / 500) * 250);
+  const pm25UgM3 = scenarioPm25UgM3 ?? Math.max(5, (ambientAQI / 500) * 250);
   const config = MODE_CONFIGS[mode];
   const durationHours = distanceKm / config.speed;
   const durationMinutes = Math.max(1, Math.round(durationHours * 60));

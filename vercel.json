@@ -84,7 +84,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!llms\\.txt|\\.well-known/|robots\\.txt|sitemap\\.xml|assets/).*)",
+      "source": "/((?!api/|llms\\.txt|\\.well-known/|robots\\.txt|sitemap\\.xml|assets/).*)",
       "destination": "/index.html"
     }
   ]

@@ -4,7 +4,7 @@
 // Linear/Raycast/Stripe craftsmanship with full WCAG 2.2 AA accessibility
 // ============================================================
 
-import { memo, useState, useEffect, lazy, Suspense, type SVGProps } from 'react';
+import { memo, useState, useCallback, lazy, Suspense, type SVGProps } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { TabId } from '@/types';
 import { TRANSLATIONS } from '@/lib/constants';
@@ -13,8 +13,7 @@ import { BRANDING } from '@/config/branding';
 import { DesktopSidebar } from './DesktopSidebar';
 import { MobileNavDrawer } from './MobileNavDrawer';
 
-// Lazy-load AuthModal & Firebase to prevent render-blocking initial load
-const AuthModal = lazy(() => import('@/components/Auth/AuthModal').then(m => ({ default: m.AuthModal })));
+const ProjectInfoModal = lazy(() => import('@/components/shared/ProjectInfoModal').then((m) => ({ default: m.ProjectInfoModal })));
 import {
   ShieldLogo,
   TelemetryIcon,
@@ -64,9 +63,10 @@ export const Header = memo(function Header() {
     toggleTheme,
   } = useAppContext();
 
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{ name: string; role: string } | null>(null);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const closeInfo = useCallback(() => setIsInfoOpen(false), []);
+  const closeMobileMenu = useCallback(() => setIsMobileMenuOpen(false), []);
 
   const t = TRANSLATIONS[language] || TRANSLATIONS.en;
   const aqiColor = getAQIColor(selectedZone.aqi);
@@ -75,13 +75,13 @@ export const Header = memo(function Header() {
     {
       id: TabId.Dashboard,
       label: t.tabDashboard || 'Air Telemetry',
-      subtitle: 'Real-time mesh sensors',
+      subtitle: 'Synthetic air-quality scenarios',
       icon: <TelemetryIcon size={17} />,
     },
     {
       id: TabId.Routine,
       label: t.tabRoutine || 'Routine Optimizer',
-      subtitle: 'AI exposure schedules',
+      subtitle: 'Rules & optional AI planning',
       icon: <RoutineIcon size={17} />,
     },
     {
@@ -103,17 +103,6 @@ export const Header = memo(function Header() {
       icon: <CommunityIcon size={17} />,
     },
   ];
-
-  // Close mobile drawer on Escape key for accessibility
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isMobileMenuOpen) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isMobileMenuOpen]);
 
   // Keyboard navigation for tablist
   const handleTabKeyDown = (e: React.KeyboardEvent, index: number) => {
@@ -162,8 +151,7 @@ export const Header = memo(function Header() {
           setSelectedZoneId={setSelectedZoneId}
           zones={zones}
           aqiColor={aqiColor}
-          currentUser={currentUser}
-          onOpenAuth={() => setIsAuthOpen(true)}
+          onOpenInfo={() => setIsInfoOpen(true)}
           language={language}
           onLanguageChange={setLanguage}
           accessibilityMode={accessibilityMode}
@@ -195,8 +183,8 @@ export const Header = memo(function Header() {
               <span className="font-extrabold text-slate-900 dark:text-white tracking-tight">
                 {BRANDING.productName}
               </span>
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-cyan-50 dark:bg-cyan-950/70 text-cyan-700 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800">
-                ACTIVE
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                DEMO
               </span>
             </div>
           </div>
@@ -232,14 +220,13 @@ export const Header = memo(function Header() {
             ============================================================ */}
         <MobileNavDrawer
           isOpen={isMobileMenuOpen}
-          onClose={() => setIsMobileMenuOpen(false)}
+          onClose={closeMobileMenu}
           activeTab={activeTab}
           onSelectTab={handleSelectTab}
           tabs={tabs}
           selectedZone={selectedZone}
           aqiColor={aqiColor}
-          currentUser={currentUser}
-          onOpenAuth={() => setIsAuthOpen(true)}
+          onOpenInfo={() => setIsInfoOpen(true)}
           language={language}
           onLanguageChange={setLanguage}
           accessibilityMode={accessibilityMode}
@@ -247,16 +234,9 @@ export const Header = memo(function Header() {
         />
       </header>
 
-      {/* Auth SaaS & Firebase Integration Modal (Lazy-loaded to keep initial bundle ultra-fast) */}
-      {isAuthOpen && (
+      {isInfoOpen && (
         <Suspense fallback={null}>
-          <AuthModal
-            isOpen={isAuthOpen}
-            onClose={() => setIsAuthOpen(false)}
-            onLoginSuccess={(user) => {
-              setCurrentUser(user);
-            }}
-          />
+          <ProjectInfoModal isOpen={isInfoOpen} onClose={closeInfo} />
         </Suspense>
       )}
     </>

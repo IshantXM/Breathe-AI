@@ -37,7 +37,8 @@ export function getAQIColor(aqi: number): string {
 }
 
 /**
- * Computes AQI sub-index for PM2.5 concentration (ug/m3) using US-EPA breakpoints.
+ * Computes the US EPA PM2.5 AQI sub-index using the May 2024 breakpoints.
+ * PM2.5 is truncated (not rounded) to one decimal place before interpolation.
  */
 export function calculatePM25SubIndex(pm25: number): number {
   assertFiniteNumber(pm25, 'pm25');
@@ -45,15 +46,13 @@ export function calculatePM25SubIndex(pm25: number): number {
     throw new RangeError(`PM2.5 concentration cannot be negative. Received: ${pm25}`);
   }
 
-  // Round to one decimal place per EPA guideline
-  const c = Math.round(pm25 * 10) / 10;
+  const c = Math.floor(pm25 * 10 + Number.EPSILON) / 10;
 
-  if (c <= 12.0) return linearInterpolation(c, 0.0, 12.0, 0, 50);
-  if (c <= 35.4) return linearInterpolation(c, 12.1, 35.4, 51, 100);
+  if (c <= 9.0) return linearInterpolation(c, 0.0, 9.0, 0, 50);
+  if (c <= 35.4) return linearInterpolation(c, 9.1, 35.4, 51, 100);
   if (c <= 55.4) return linearInterpolation(c, 35.5, 55.4, 101, 150);
-  if (c <= 150.4) return linearInterpolation(c, 55.5, 150.4, 151, 200);
-  if (c <= 250.4) return linearInterpolation(c, 150.5, 250.4, 201, 300);
-  if (c <= 350.4) return linearInterpolation(c, 250.5, 350.4, 301, 400);
-  if (c <= 500.4) return linearInterpolation(c, 350.5, 500.4, 401, 500);
+  if (c <= 125.4) return linearInterpolation(c, 55.5, 125.4, 151, 200);
+  if (c <= 225.4) return linearInterpolation(c, 125.5, 225.4, 201, 300);
+  if (c <= 325.4) return linearInterpolation(c, 225.5, 325.4, 301, 500);
   return 500;
 }

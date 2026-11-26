@@ -23,7 +23,7 @@ describe('App Root Layout Rendering', () => {
     expect(screen.getByRole('tabpanel')).toBeInTheDocument();
     expect(screen.getByRole('contentinfo', { name: /application footer/i })).toBeInTheDocument();
     expect(screen.getAllByText('BreatheWay').length).toBeGreaterThan(0);
-    expect(screen.getByText('LIVE')).toBeInTheDocument();
+    expect(screen.getByText(/no live air-quality monitors are connected/i)).toBeInTheDocument();
   });
 });
 
@@ -118,8 +118,8 @@ describe('CommunityHub Rendering', () => {
     );
 
     expect(screen.getByText(/Community Smog Abatement Dashboard/i)).toBeInTheDocument();
-    expect(screen.getByText('CO₂ Prevented')).toBeInTheDocument();
-    expect(screen.getByText('PM2.5 Averted')).toBeInTheDocument();
+    expect(screen.getByText('Illustrative CO₂ estimate')).toBeInTheDocument();
+    expect(screen.getByText('Illustrative PM2.5 estimate')).toBeInTheDocument();
     expect(screen.getByText(/Neighborhood Carpool & Micro-Transit Days/i)).toBeInTheDocument();
   });
 });

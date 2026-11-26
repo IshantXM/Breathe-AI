@@ -62,14 +62,14 @@ export const SmogHeatmap = memo(function SmogHeatmap({
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
             <span className="text-[10px] font-black tracking-widest uppercase text-emerald-600 dark:text-emerald-400 font-mono">
-              LIVE DISPERSION TELEMETRY
+              DEMO SCENARIO MAP
             </span>
           </div>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
             Urban Smog Heatmap & Dispersion Grid
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Real-time spatial visualization across municipal telemetry monitoring nodes
+            Illustrative readings in five sample city sectors; not live monitor data.
           </p>
         </div>
 

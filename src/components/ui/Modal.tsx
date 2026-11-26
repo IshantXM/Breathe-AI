@@ -4,7 +4,8 @@
 // Dual Theme Support (Light & Dark) & WCAG 2.2 Level AA Focus Management
 // ============================================================
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useId, useRef, type ReactNode } from 'react';
+import { useDialogFocus } from '@/hooks/useDialogFocus';
 import { CloseIcon } from './Icons';
 
 export interface ModalProps {
@@ -25,24 +26,8 @@ export function Modal({
   maxWidth = 'md',
 }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onClose]);
+  const id = useId();
+  useDialogFocus(dialogRef, isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -57,8 +42,8 @@ export function Modal({
     <div
       role="dialog"
       aria-modal="true"
-      aria-labelledby="modal-title"
-      aria-describedby={description ? 'modal-description' : undefined}
+      aria-labelledby={`${id}-title`}
+      aria-describedby={description ? `${id}-description` : undefined}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
     >
       {/* Backdrop */}
@@ -75,11 +60,11 @@ export function Modal({
       >
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
-            <h2 id="modal-title" className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+            <h2 id={`${id}-title`} className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
               {title}
             </h2>
             {description && (
-              <p id="modal-description" className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <p id={`${id}-description`} className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 {description}
               </p>
             )}

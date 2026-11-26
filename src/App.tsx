@@ -62,13 +62,12 @@ const AppShell = memo(function AppShell() {
         return 'Indoor Air Quality & CADR';
       case TabId.Community:
         return 'Community Smog Abatement';
-      default:
-        return 'Air Telemetry';
     }
   };
 
   return (
     <div
+      data-motion={accessibilityMode === 'reduced-motion' ? 'reduced' : undefined}
       className={`min-h-screen bg-slate-50/70 dark:bg-[#050811] text-slate-900 dark:text-slate-100 flex flex-col lg:flex-row relative selection:bg-cyan-500 selection:text-white transition-colors duration-200 overflow-x-hidden ${
         accessibilityMode === 'high-contrast' ? 'contrast-125' : ''
       }`}
@@ -112,33 +111,31 @@ const AppShell = memo(function AppShell() {
           <div className="flex items-center gap-3 text-xs">
             <span className="flex items-center gap-1.5 font-semibold text-cyan-700 dark:text-cyan-400 px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-200/60 dark:border-cyan-800/60 shadow-2xs">
               <span className="relative flex h-2 w-2" aria-hidden="true">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
               </span>
-              Gemini 3.1 Neural Core
+              Scenario planning · optional AI
             </span>
             <span className="text-slate-300 dark:text-slate-700 hidden xl:inline">•</span>
             <span className="text-slate-600 dark:text-slate-400 font-mono text-[11px] hidden xl:inline">
-              Zero-Trust Architecture
+              No account required
             </span>
           </div>
         </div>
 
-        {/* Global Alert Banner Overlay */}
-        <AlertBanner alerts={alerts} onDismiss={dismissAlert} />
-
         {/* 3. Primary Semantic Landmark Viewport (Clean landmark without tabpanel roles) */}
         <main
           id="main-content"
-          className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 focus:outline-none relative z-10"
+          tabIndex={-1}
+          className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 relative z-10"
         >
+          <AlertBanner alerts={alerts} onDismiss={dismissAlert} />
           {/* Inner Tabpanel with role="tabpanel" and exact matching ID for aria-controls */}
           <div
             role="tabpanel"
             id={`panel-${activeTab}`}
-            aria-labelledby={`tab-${activeTab}`}
+            aria-label={getTabTitle(activeTab)}
             tabIndex={0}
-            className="transition-opacity duration-200 outline-none"
+            className="transition-opacity duration-200"
           >
             {activeTab === TabId.Dashboard && <AirTelemetryDashboard />}
             <Suspense fallback={<TabLoadingSkeleton />}>
@@ -148,6 +145,9 @@ const AppShell = memo(function AppShell() {
               {activeTab === TabId.Community && <CommunityHub />}
             </Suspense>
           </div>
+          {Object.values(TabId).filter((tab) => tab !== activeTab).map((tab) => (
+            <div key={tab} id={`panel-${tab}`} role="tabpanel" aria-label={getTabTitle(tab)} hidden />
+          ))}
         </main>
 
         {/* 4. Modern Enterprise Footer Landmark */}
@@ -178,25 +178,25 @@ const AppShell = memo(function AppShell() {
                 Community Engine
               </span>
               <span className="hidden sm:inline text-slate-300 dark:text-slate-700" aria-hidden="true">•</span>
-              <span className="font-semibold text-cyan-800 dark:text-cyan-300">WCAG 2.2 Level AA Compliant</span>
+              <span className="font-semibold text-cyan-800 dark:text-cyan-300">Keyboard & screen-reader support</span>
               <span className="hidden sm:inline text-slate-300 dark:text-slate-700" aria-hidden="true">•</span>
-              <span>EPA Breakpoints Standardized</span>
+              <span>US EPA PM2.5 breakpoints · May 2024</span>
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-600 dark:text-slate-300">
               <span className="flex items-center gap-1.5 font-medium text-cyan-700 dark:text-cyan-400 px-2.5 py-1 rounded-full bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200/60 dark:border-cyan-800/60">
                 <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
                 </span>
-                Gemini 3.1 Neural Engine
+                Rules-based fallback available
               </span>
               <span className="text-slate-300 dark:text-slate-700" aria-hidden="true">•</span>
-              <span>Zero-Trust Security</span>
-              <span className="text-slate-300 dark:text-slate-700" aria-hidden="true">•</span>
-              <span>Firebase 11 Connected</span>
+              <span>Local-first demo</span>
             </div>
           </div>
+          <p className="mt-5 text-center text-xs leading-relaxed">
+            Scenario values are not live measurements or medical advice. Check your local air-quality authority for current conditions.
+          </p>
         </footer>
       </div>
     </div>

@@ -29,12 +29,13 @@ export interface DailyRoutinePlan {
   generatedAt: number;
   persona: string;
   optimalOutdoorWindow: {
-    startHour: number;
-    endHour: number;
+    startHour: number | null;
+    endHour: number | null;
     rationale: string;
   };
   hourlySchedule: RoutineHour[];
   totalExposureScore: number;
-  carbonOffsetKg: number;
+  carbonOffsetKg: number | null;
   generalAdvice: string[];
+  source?: 'gemini' | 'rules';
 }

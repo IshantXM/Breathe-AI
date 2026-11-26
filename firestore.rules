@@ -15,12 +15,6 @@ service cloud.firestore {
       }
     }
 
-    // Community pledges public read, authenticated counter increments
-    match /community_pledges/{pledgeId} {
-      allow read: if true;
-      allow update: if request.auth != null;
-    }
-
     // Default deny all other paths
     match /{document=**} {
       allow read, write: if false;

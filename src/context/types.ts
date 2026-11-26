@@ -9,7 +9,6 @@ import {
   AccessibilityMode,
   type UrbanZone,
   type PersonaProfile,
-  type DailyRoutinePlan,
   type IAQRoomConfig,
   type CommunityPledge,
   type CommunityAlert,
@@ -32,17 +31,12 @@ export interface AppContextValue {
   setLanguage: (lang: Language) => void;
   accessibilityMode: AccessibilityMode;
   setAccessibilityMode: (mode: AccessibilityMode) => void;
-  routinePlan: DailyRoutinePlan | null;
-  setRoutinePlan: (plan: DailyRoutinePlan | null) => void;
   rooms: IAQRoomConfig[];
   updateRoom: (roomId: string, updates: Partial<IAQRoomConfig>) => void;
   pledges: CommunityPledge[];
   togglePledge: (pledgeId: string) => void;
   alerts: CommunityAlert[];
   dismissAlert: (id: string) => void;
-  globalBanner: string | null;
-  setGlobalBanner: (msg: string | null) => void;
   theme: AppTheme;
-  setTheme: (theme: AppTheme) => void;
   toggleTheme: () => void;
 }

@@ -47,7 +47,7 @@ export const CommunityHub = memo(function CommunityHub() {
       setAiAdvisory(advisory);
     } catch {
       setAiAdvisory(
-        `URGENT NOTICE for ${selectedZone.zoneName}: AQI is ${selectedZone.aqi}. Please activate indoor filtration, seal doors, and assist vulnerable neighbors.`
+        `${selectedZone.zoneName} demo snapshot: AQI ${selectedZone.aqi}. This is not a live or official alert; check your local air-quality authority for current conditions and advice.`
       );
     } finally {
       setIsGenerating(false);
@@ -73,7 +73,7 @@ export const CommunityHub = memo(function CommunityHub() {
             Community Smog Abatement Dashboard
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-            When neighbors coordinate emission curbs—eliminating backyard burning, coordinating carpools, and wet-sweeping streets—local PM2.5 levels decrease by up to 28%.
+            Explore how neighborhood actions might reduce emissions. Participant counts are sample data and your pledge stays on this device.
           </p>
         </div>
 
@@ -81,25 +81,25 @@ export const CommunityHub = memo(function CommunityHub() {
         <div className="flex flex-wrap sm:flex-nowrap gap-4 shrink-0">
           <div className="glass-panel border-emerald-300 dark:border-emerald-800/80 rounded-2xl p-5 sm:p-6 text-center min-w-[155px] flex-1 sm:flex-none shadow-xs hover:border-emerald-400 dark:hover:border-emerald-700 transition-colors">
             <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider block font-mono">
-              CO₂ Prevented
+              Illustrative CO₂ estimate
             </span>
             <div className="text-3xl sm:text-4xl font-black text-emerald-700 dark:text-emerald-400 mt-1 font-mono tracking-tight font-mono-numbers">
               {collectiveMetrics.totalCo2Kg} <span className="text-xs text-slate-400 font-normal">kg</span>
             </div>
             <span className="text-[10px] text-emerald-700 dark:text-emerald-400 mt-1.5 block font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/60 dark:border-emerald-800/60">
-              Carbon Curbs Active
+              Based on demo assumptions
             </span>
           </div>
 
           <div className="glass-panel border-sky-300 dark:border-sky-800/80 rounded-2xl p-5 sm:p-6 text-center min-w-[155px] flex-1 sm:flex-none shadow-xs hover:border-sky-400 dark:hover:border-sky-700 transition-colors">
             <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-black tracking-wider block font-mono">
-              PM2.5 Averted
+              Illustrative PM2.5 estimate
             </span>
             <div className="text-3xl sm:text-4xl font-black text-sky-700 dark:text-sky-400 mt-1 font-mono tracking-tight font-mono-numbers">
               {collectiveMetrics.totalPm25Grams} <span className="text-xs text-slate-400 font-normal">g</span>
             </div>
             <span className="text-[10px] text-sky-700 dark:text-sky-400 mt-1.5 block font-bold px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950/60 border border-sky-200/60 dark:border-sky-800/60">
-              Pulmonary Relief
+              Not a measured health outcome
             </span>
           </div>
         </div>
@@ -111,10 +111,10 @@ export const CommunityHub = memo(function CommunityHub() {
           <div>
             <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2.5">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" aria-hidden="true" />
-              <span>Multilingual Emergency Smog Advisories</span>
+                <span>Smog Advisory Drafts</span>
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Live automated broadcast generation for neighborhood associations and school boards.
+              Draft informational text from the selected demo snapshot. Not an official alert.
             </p>
           </div>
 
@@ -140,7 +140,7 @@ export const CommunityHub = memo(function CommunityHub() {
           >
             <div className="flex items-center gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span>Official Air Resilience Broadcast ({language.toUpperCase()}):</span>
+              <span>Draft for review:</span>
             </div>
             <p className="text-slate-800 dark:text-slate-200">{aiAdvisory}</p>
           </div>
@@ -151,8 +151,6 @@ export const CommunityHub = memo(function CommunityHub() {
           {alerts.map((alert) => (
             <div
               key={alert.id}
-              role="alert"
-              aria-live="assertive"
               className={`p-5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all ${
                 alert.severity === 'emergency'
                   ? 'bg-rose-50/70 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/60 text-rose-900 dark:text-rose-200'
@@ -172,7 +170,7 @@ export const CommunityHub = memo(function CommunityHub() {
                 <div>
                   <div className="flex items-center gap-2.5">
                     <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300">
-                      {alert.zone}
+                      Demo notice · {alert.zone}
                     </span>
                     <h4 className="font-extrabold text-sm text-slate-900 dark:text-white tracking-tight">
                       {alert.headline}

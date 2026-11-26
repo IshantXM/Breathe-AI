@@ -339,27 +339,6 @@ export function UserIcon({ size = 16, className = '', ...props }: IconProps) {
   );
 }
 
-export function LockIcon({ size = 16, className = '', ...props }: IconProps) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-      {...props}
-    >
-      <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  );
-}
-
 export function ChevronDownIcon({ size = 14, className = '', ...props }: IconProps) {
   return (
     <svg
@@ -445,22 +424,6 @@ export function MoonIcon({ size = 16, className = '', ...props }: IconProps) {
       {...props}
     >
       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-    </svg>
-  );
-}
-
-export function FirebaseIcon({ size = 16, className = '', ...props }: IconProps) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className={className}
-      aria-hidden="true"
-      {...props}
-    >
-      <path d="M4.5 19.5 7.7 3.5l4.3 8.3-4.5 7.7H4.5zm11.8-6.9 2.5-4.8 1.7 11.7h-7l2.8-6.9zm-4.7-.6L7.9 3.5l7.5 16H8.2l3.4-7.5z" />
     </svg>
   );
 }
@@ -617,24 +580,3 @@ export function MetroIcon({ size = 16, className = '', ...props }: IconProps) {
     </svg>
   );
 }
-
-export function CheckIcon({ size = 16, className = '', ...props }: IconProps) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-      {...props}
-    >
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-

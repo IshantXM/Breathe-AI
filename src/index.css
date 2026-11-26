@@ -195,6 +195,18 @@ body {
   border-radius: 8px;
 }
 
+[data-motion="reduced"], [data-motion="reduced"] *, [data-motion="reduced"] *::before, [data-motion="reduced"] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 /* ------------------------------------------------------------
    Precision Surface Panels (Linear & Stripe Craftsmanship)
    ------------------------------------------------------------ */

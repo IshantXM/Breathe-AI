@@ -6,7 +6,6 @@ dist
 coverage
 *.tsbuildinfo
 firebase-debug.log*
-.github/
 *.mp4
 *.webm
 *.wav

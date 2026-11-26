@@ -21,10 +21,10 @@ export const BRANDING = {
 
   // Compliance & Standards badges
   standards: [
-    { label: 'WCAG 2.2 AA', tooltip: 'Full accessibility & twin representation' },
-    { label: 'EPA Standardized', tooltip: 'Calibrated air quality sub-indexes' },
-    { label: 'Community Powered', tooltip: 'Hyperlocal clean route sharing & neighborhood pledges' },
-    { label: 'Gemini 3.1 AI', tooltip: 'Server-side neural routine optimization' },
+    { label: 'Accessible UI', tooltip: 'Keyboard access and text alternatives for visualizations' },
+    { label: 'US EPA PM2.5', tooltip: 'Updated May 2024 PM2.5 concentration breakpoints' },
+    { label: 'Scenario Demo', tooltip: 'Illustrative sample values; no live monitors connected' },
+    { label: 'Optional AI', tooltip: 'Server-side routine drafts with a local rules-based fallback' },
   ],
 
   // Theme primary palettes - Warm, community-friendly & accessible

@@ -51,7 +51,7 @@ export const TransitPlanner = memo(function TransitPlanner() {
             Low-Exposure Commute & Transit Path Optimizer
           </h2>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2 max-w-2xl leading-relaxed">
-            Dijkstra-powered algorithm identifying subterranean and clean-air corridors to bypass surface smog hotspots.
+             Compare routes on a sample city network. The algorithm minimizes an illustrative exposure cost, not live pollution or travel time.
           </p>
         </div>
 
@@ -128,7 +128,7 @@ export const TransitPlanner = memo(function TransitPlanner() {
             <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-slate-800/80">
               <span className="text-xs font-extrabold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                Optimal Clean-Air Trajectory (Dijkstra Min-Exposure Cost: {lowestExposureResult.totalExposure})
+                 Lowest modeled exposure (cost: {lowestExposureResult.totalExposure})
               </span>
               <span className="text-xs text-slate-600 dark:text-slate-400 font-medium bg-white dark:bg-slate-800 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
                 Distance: <strong className="text-slate-900 dark:text-slate-100 font-mono font-bold">{routeDistanceKm} km</strong>
@@ -183,7 +183,7 @@ export const TransitPlanner = memo(function TransitPlanner() {
               <span>Multi-Modal Exposure & Carbon Comparison</span>
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Evaluated against current ambient air quality in {selectedZone.zoneName} (AQI {selectedZone.aqi})
+               Uses sample PM2.5 in {selectedZone.zoneName} ({selectedZone.pm25} µg/m³) with assumed travel speeds, breathing rates, and filtration. Not a personal exposure measurement.
             </p>
           </div>
           <span className="text-xs text-slate-600 dark:text-slate-300 font-mono bg-slate-100 dark:bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 self-start sm:self-auto">
@@ -191,7 +191,11 @@ export const TransitPlanner = memo(function TransitPlanner() {
           </span>
         </div>
 
-        <TransitComparisonTable modalComparisons={modalComparisons} />
+        {modalComparisons.length > 0 ? <TransitComparisonTable modalComparisons={modalComparisons} /> : (
+          <p role="status" className="text-sm text-slate-700 dark:text-slate-300">
+            {originId === destinationId ? 'No trip to compare. Choose a different destination.' : 'No route found between these sample waypoints.'}
+          </p>
+        )}
       </div>
     </section>
   );

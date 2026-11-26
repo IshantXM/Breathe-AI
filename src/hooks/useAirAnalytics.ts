@@ -25,14 +25,13 @@ export interface AirAnalyticsReturn {
   pollutantBreakdown: PollutantReading[];
   simulateSmogSpike: () => void;
   simulateCleanDispersion: () => void;
-  selectZone: (zoneId: string) => void;
   zones: UrbanZone[];
   selectedZoneId: string;
   setSelectedZoneId: (zoneId: string) => void;
 }
 
 /**
- * Custom hook providing reactive real-time telemetry analytics, inversion risk assessment,
+ * Custom hook providing reactive scenario telemetry analytics, inversion risk assessment,
  * pollutant breakdown sparklines, and simulation controls for the focused urban sector.
  */
 export function useAirAnalytics(): AirAnalyticsReturn {
@@ -126,13 +125,6 @@ export function useAirAnalytics(): AirAnalyticsReturn {
     });
   }, [currentZone, updateZone]);
 
-  const selectZone = useCallback(
-    (zoneId: string) => {
-      setSelectedZoneId(zoneId);
-    },
-    [setSelectedZoneId]
-  );
-
   return {
     currentZone,
     aqiCategory,
@@ -141,7 +133,6 @@ export function useAirAnalytics(): AirAnalyticsReturn {
     pollutantBreakdown,
     simulateSmogSpike,
     simulateCleanDispersion,
-    selectZone,
     zones,
     selectedZoneId,
     setSelectedZoneId,

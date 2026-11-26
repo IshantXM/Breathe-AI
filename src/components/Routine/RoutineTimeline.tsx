@@ -40,7 +40,7 @@ export const RoutineTimeline = memo(function RoutineTimeline({
         <div className="flex items-center gap-2 self-start sm:self-auto">
           <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
             <ClockIcon size={13} className="text-slate-400 dark:text-slate-500" />
-            24-Hour Predictive Window
+            Scenario schedule · not a forecast
           </span>
         </div>
       </div>
@@ -104,7 +104,7 @@ export const RoutineTimeline = memo(function RoutineTimeline({
               <div className="flex items-center gap-4 text-xs shrink-0 justify-between lg:justify-end border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-200 dark:border-slate-800">
                 <div className="text-left lg:text-right">
                   <div className="text-[10px] uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">
-                    Predicted AQI
+                    Scenario AQI
                   </div>
                   <div className="font-mono font-bold text-sm text-slate-900 dark:text-slate-100 mt-0.5 flex items-center lg:justify-end gap-1.5">
                     <ActivityIcon size={13} className="text-slate-400 dark:text-slate-500" />

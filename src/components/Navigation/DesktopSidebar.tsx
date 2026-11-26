@@ -46,8 +46,7 @@ export interface DesktopSidebarProps {
   setSelectedZoneId: (zoneId: string) => void;
   zones: UrbanZone[];
   aqiColor: string;
-  currentUser: { name: string; role: string } | null;
-  onOpenAuth: () => void;
+  onOpenInfo: () => void;
   language: Language;
   onLanguageChange: (lang: Language) => void;
   accessibilityMode: AccessibilityMode;
@@ -66,8 +65,7 @@ export const DesktopSidebar = memo(function DesktopSidebar({
   setSelectedZoneId,
   zones,
   aqiColor,
-  currentUser,
-  onOpenAuth,
+  onOpenInfo,
   language,
   onLanguageChange,
   accessibilityMode,
@@ -100,10 +98,9 @@ export const DesktopSidebar = memo(function DesktopSidebar({
 
           <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/60 shadow-2xs">
             <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-slate-500"></span>
             </span>
-            LIVE
+            DEMO
           </span>
         </div>
 
@@ -117,7 +114,7 @@ export const DesktopSidebar = memo(function DesktopSidebar({
       <div className="p-4 mx-3 my-3 rounded-2xl bg-slate-50/90 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 shadow-2xs flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-black tracking-wider uppercase text-slate-600 dark:text-slate-400 font-mono">
-            ACTIVE TELEMETRY SECTOR
+            SELECTED DEMO SECTOR
           </span>
           <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: aqiColor }} />
         </div>
@@ -187,6 +184,7 @@ export const DesktopSidebar = memo(function DesktopSidebar({
 
         <div
           role="tablist"
+          aria-orientation="vertical"
           aria-label="Main navigation panels"
           className="flex flex-col gap-1.5"
         >
@@ -244,8 +242,8 @@ export const DesktopSidebar = memo(function DesktopSidebar({
         {/* User Account / Sign In Pill */}
         <button
           type="button"
-          onClick={onOpenAuth}
-          aria-label={currentUser ? `Signed in as ${currentUser.name}` : 'Citizen Portal — Sign In (Secure Operator Mode)'}
+          onClick={onOpenInfo}
+          aria-label="About the BreatheWay demo"
           className="w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-bold bg-white dark:bg-slate-800/90 hover:bg-slate-100 dark:hover:bg-slate-700/80 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700/70 shadow-2xs transition-all active:scale-98 cursor-pointer"
         >
           <div className="flex items-center gap-2.5">
@@ -254,15 +252,15 @@ export const DesktopSidebar = memo(function DesktopSidebar({
             </div>
             <div className="flex flex-col text-left">
               <span className="text-[11px] font-extrabold text-slate-900 dark:text-white">
-                {currentUser ? currentUser.name : 'Citizen Portal'}
+                About this demo
               </span>
               <span className="text-[9px] text-slate-500 dark:text-slate-400 font-normal">
-                {currentUser ? currentUser.role : 'Secure Operator Mode'}
+                Synthetic data · saved locally
               </span>
             </div>
           </div>
           <span className="text-[10px] text-cyan-800 dark:text-cyan-300 font-bold">
-            {currentUser ? 'Active' : 'Sign In'}
+            About
           </span>
         </button>
 

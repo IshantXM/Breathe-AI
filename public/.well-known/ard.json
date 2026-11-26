@@ -2,7 +2,7 @@
   "$schema": "https://agentic-resource-discovery.org/schemas/v0.91/ard.json",
   "version": "0.91",
   "title": "BreatheWay Clean Air Navigation & Telemetry Resource Directory",
-  "description": "Agentic Resource Directory for the BreatheWay hyperlocal air quality and personal exposure management platform.",
+  "description": "Directory for the BreatheWay synthetic air-quality scenario demo. Not a live feed or forecast.",
   "entries": [
     {
       "identifier": "urn:air:prompt-wars-challenge-6.vercel.app:dashboard",
@@ -12,7 +12,7 @@
       "representativeQueries": [
         "air quality index",
         "hyperlocal AQI telemetry",
-        "live smog monitoring"
+        "winter smog simulation"
       ]
     },
     {
@@ -22,8 +22,8 @@
       "url": "https://prompt-wars-challenge-6.vercel.app/#routine",
       "representativeQueries": [
         "clean air daily routine",
-        "schedule outdoor activity safe AQI",
-        "inversion forecast exercise"
+        "illustrative outdoor activity planning",
+        "winter inversion scenario"
       ]
     },
     {
@@ -55,7 +55,7 @@
       "url": "https://prompt-wars-challenge-6.vercel.app/#community",
       "representativeQueries": [
         "community smog abatement",
-        "report urban pollution hotspot",
+        "local demo air quality pledge",
         "clean air collective actions"
       ]
     },
@@ -69,14 +69,12 @@
         "sensor mesh telemetry schema"
       ],
       "data": {
-        "standard": "US EPA NAAQS Breakpoints",
-        "pollutants": ["PM2.5", "PM10", "NO2", "O3", "CO", "SO2"],
+        "standard": "US EPA PM2.5 breakpoint helper, May 2024 revision",
+        "pollutants": ["PM2.5", "PM10", "NO2", "O3", "CO"],
         "aqiScale": { "min": 0, "max": 500 },
-        "sectorsMonitored": 5,
+        "sampleSectors": 5,
         "routingEngine": "Dijkstra Exposure-Weighted Corridors",
-        "iaqModel": "CADR / Air Changes per Hour (ACH)",
-        "compliance": "WCAG 2.2 AA",
-        "zeroTrust": true
+        "iaqModel": "CADR / Air Changes per Hour (ACH)"
       }
     }
   ]

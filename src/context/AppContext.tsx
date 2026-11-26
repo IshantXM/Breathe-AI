@@ -20,7 +20,6 @@ import {
   AccessibilityMode,
   type UrbanZone,
   type PersonaProfile,
-  type DailyRoutinePlan,
   type IAQRoomConfig,
   type CommunityPledge,
   type CommunityAlert,
@@ -42,17 +41,17 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
   const [activePersona, setActivePersonaState] = useState<PersonaProfile>(() => storageService.getActivePersona());
   const [language, setLanguageState] = useState<Language>(Language.English);
   const [accessibilityMode, setAccessibilityModeState] = useState<AccessibilityMode>(AccessibilityMode.Standard);
-  const [routinePlan, setRoutinePlanState] = useState<DailyRoutinePlan | null>(() => storageService.getRoutinePlan());
   const [rooms, setRooms] = useState<IAQRoomConfig[]>(() => storageService.getRooms());
   const [pledges, setPledges] = useState<CommunityPledge[]>(() => storageService.getPledges());
   const [alerts, setAlerts] = useState<CommunityAlert[]>(DEFAULT_ALERTS);
-  const [globalBanner, setGlobalBanner] = useState<string | null>(null);
 
   // Theme State: defaults to 'light' per user requirement
   const [theme, setThemeState] = useState<AppTheme>(() => {
-    if (typeof window !== 'undefined') {
+    try {
       const saved = localStorage.getItem('breatheway_theme_v1');
       if (saved === 'dark' || saved === 'light') return saved;
+    } catch {
+      // Storage may be unavailable in a sandboxed browser.
     }
     return 'light';
   });
@@ -72,10 +71,6 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
       }
     }
   }, [theme]);
-
-  const setTheme = useCallback((t: AppTheme) => {
-    setThemeState(t);
-  }, []);
 
   const toggleTheme = useCallback(() => {
     setThemeState((prev) => (prev === 'light' ? 'dark' : 'light'));
@@ -117,11 +112,6 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
 
   const setAccessibilityMode = useCallback((mode: AccessibilityMode) => {
     setAccessibilityModeState(mode);
-  }, []);
-
-  const setRoutinePlan = useCallback((plan: DailyRoutinePlan | null) => {
-    setRoutinePlanState(plan);
-    if (plan) storageService.saveRoutinePlan(plan);
   }, []);
 
   const updateRoom = useCallback((roomId: string, updates: Partial<IAQRoomConfig>) => {
@@ -169,18 +159,13 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     setLanguage,
     accessibilityMode,
     setAccessibilityMode,
-    routinePlan,
-    setRoutinePlan,
     rooms,
     updateRoom,
     pledges,
     togglePledge,
     alerts,
     dismissAlert,
-    globalBanner,
-    setGlobalBanner,
     theme,
-    setTheme,
     toggleTheme,
   }), [
     activeTab,
@@ -196,18 +181,13 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     setLanguage,
     accessibilityMode,
     setAccessibilityMode,
-    routinePlan,
-    setRoutinePlan,
     rooms,
     updateRoom,
     pledges,
     togglePledge,
     alerts,
     dismissAlert,
-    globalBanner,
-    setGlobalBanner,
     theme,
-    setTheme,
     toggleTheme,
   ]);
 

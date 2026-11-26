@@ -89,4 +89,11 @@ describe('useExposureRouting hook', () => {
     expect(result.current.destNode.name).toContain('Metro Interchange');
     expect(result.current.lowestExposureResult?.path.slice(-1)[0]).toBe('N-METRO-HUB');
   });
+
+  it('does not fabricate a trip if both waypoints are identical', () => {
+    const { result } = renderHook(() => useExposureRouting(), { wrapper });
+    act(() => result.current.setDestination(result.current.originId));
+    expect(result.current.routeDistanceKm).toBe(0);
+    expect(result.current.modalComparisons).toEqual([]);
+  });
 });

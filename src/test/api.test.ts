@@ -86,18 +86,17 @@ describe('Live HTTP Backend API Endpoints', () => {
     });
     expect(res1.status).toBe(200);
 
-    // Second request (sub-10ms from cache)
-    const tStart = performance.now();
+    const first = await res1.json();
+    const populatedSize = insightCache.size;
     const res2 = await fetch(`${baseUrl}/api/routine-insights`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    const tElapsed = performance.now() - tStart;
-
     expect(res2.status).toBe(200);
-    expect(tElapsed).toBeLessThan(50); // fast local retrieval
-    expect(insightCache.size).toBeGreaterThanOrEqual(initialCacheSize);
+    expect(await res2.json()).toEqual(first);
+    expect(populatedSize).toBe(initialCacheSize + 1);
+    expect(insightCache.size).toBe(populatedSize);
   });
 
   it('POST /api/routine-insights returns 400 on malformed or out-of-range zone', async () => {
@@ -175,7 +174,7 @@ describe('Live HTTP Backend API Endpoints', () => {
 
     expect(res.status).toBe(200);
     const data = await res.json();
-    expect(data.advisory).toContain('EMERGENCY SMOG ADVISORY');
+    expect(data.advisory).toContain('not a live or official alert');
   });
 
   it('POST /api/emergency-advisory returns 400 when zone is omitted', async () => {
@@ -194,5 +193,38 @@ describe('Live HTTP Backend API Endpoints', () => {
     const res = await fetch(`${baseUrl}/some-spa-deep-route`);
     // Status 200 (serves SPA index.html or fallback text)
     expect(res.status).toBe(200);
+  });
+
+  it('rejects unlisted cross-origin requests and allows a same-origin POST', async () => {
+    const url = `${baseUrl}/api/emergency-advisory`;
+    const body = JSON.stringify({ zone: DEFAULT_ZONES[0] });
+    const request = (origin: string) => fetch(url, { method: 'POST', headers: { origin, 'content-type': 'application/json' }, body });
+    expect((await request('https://unlisted.example')).status).toBe(403);
+    expect((await request(baseUrl)).status).toBe(200);
+  });
+
+  it('returns safe client errors for invalid JSON, oversized JSON, and missing API routes', async () => {
+    const post = (body: string) => fetch(`${baseUrl}/api/routine-insights`, { method: 'POST', headers: { 'content-type': 'application/json' }, body });
+    expect((await post('{')).status).toBe(400);
+    expect((await post(JSON.stringify({ padding: 'a'.repeat(16_000) }))).status).toBe(413);
+    const missing = await fetch(`${baseUrl}/api/missing`);
+    expect(missing.status).toBe(404);
+    expect(await missing.json()).toEqual({ error: 'API endpoint not found.' });
+  });
+
+  it('recalculates routine guidance when PM2.5 changes at the same AQI', async () => {
+    const post = async (pm25: number) => {
+      const res = await fetch(`${baseUrl}/api/routine-insights`, {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ persona: DEFAULT_PERSONAS[0], zone: { ...DEFAULT_ZONES[0], pm25 } }),
+      });
+      expect(res.status).toBe(200);
+      return res.json();
+    };
+    const first = await post(100);
+    const second = await post(150);
+    expect(second.totalExposureScore).toBeGreaterThan(first.totalExposureScore);
+    expect(second.source).toBe('rules');
+    expect(second.optimalOutdoorWindow.startHour).toBeNull();
   });
 });

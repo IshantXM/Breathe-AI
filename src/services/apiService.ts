@@ -40,6 +40,7 @@ export const apiService = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(10_000),
     });
 
     if (!res.ok) {
@@ -55,6 +56,7 @@ export const apiService = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ zone, language }),
+      signal: AbortSignal.timeout(10_000),
     });
 
     if (!res.ok) {

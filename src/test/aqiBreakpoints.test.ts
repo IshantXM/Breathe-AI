@@ -92,22 +92,34 @@ describe('getAQIColor', () => {
 describe('calculatePM25SubIndex', () => {
   it('computes exact EPA breakpoints correctly', () => {
     expect(calculatePM25SubIndex(0.0)).toBe(0);
-    expect(calculatePM25SubIndex(12.0)).toBe(50);
-    expect(calculatePM25SubIndex(12.1)).toBe(51);
+    expect(calculatePM25SubIndex(9.0)).toBe(50);
+    expect(calculatePM25SubIndex(9.1)).toBe(51);
     expect(calculatePM25SubIndex(35.4)).toBe(100);
     expect(calculatePM25SubIndex(35.5)).toBe(101);
     expect(calculatePM25SubIndex(55.4)).toBe(150);
     expect(calculatePM25SubIndex(55.5)).toBe(151);
-    expect(calculatePM25SubIndex(150.4)).toBe(200);
-    expect(calculatePM25SubIndex(150.5)).toBe(201);
-    expect(calculatePM25SubIndex(250.4)).toBe(300);
-    expect(calculatePM25SubIndex(250.5)).toBe(301);
-    expect(calculatePM25SubIndex(350.4)).toBe(400);
-    expect(calculatePM25SubIndex(350.5)).toBe(401);
-    expect(calculatePM25SubIndex(500.4)).toBe(500);
+    expect(calculatePM25SubIndex(125.4)).toBe(200);
+    expect(calculatePM25SubIndex(125.5)).toBe(201);
+    expect(calculatePM25SubIndex(225.4)).toBe(300);
+    expect(calculatePM25SubIndex(225.5)).toBe(301);
+    expect(calculatePM25SubIndex(325.4)).toBe(500);
   });
 
-  it('caps at 500 when concentration exceeds 500.4', () => {
+  it('uses the revised 2024 AQI breakpoints for PM2.5', () => {
+    expect(calculatePM25SubIndex(12)).toBe(56);
+    expect(calculatePM25SubIndex(55.4)).toBe(150);
+    expect(calculatePM25SubIndex(150.4)).toBe(226);
+    expect(calculatePM25SubIndex(250.4)).toBe(351);
+  });
+
+  it('truncates concentration to one decimal before interpolation', () => {
+    expect(calculatePM25SubIndex(9.09)).toBe(50);
+    expect(calculatePM25SubIndex(9.1)).toBe(51);
+    expect(calculatePM25SubIndex(35.49)).toBe(100);
+  });
+
+  it('caps at 500 when concentration exceeds the AQI scale', () => {
+    expect(calculatePM25SubIndex(325.5)).toBe(500);
     expect(calculatePM25SubIndex(501)).toBe(500);
     expect(calculatePM25SubIndex(999)).toBe(500);
   });

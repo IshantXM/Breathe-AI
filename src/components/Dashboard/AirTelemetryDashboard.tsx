@@ -50,6 +50,9 @@ export const AirTelemetryDashboard = memo(function AirTelemetryDashboard() {
 
   return (
     <section aria-label="Hyperlocal AQI Telemetry Dashboard" className="flex flex-col gap-8 fade-in">
+      <p role="note" className="rounded-xl border border-sky-300 bg-sky-50 px-4 py-3 text-sm font-medium text-sky-950 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-100">
+        Demo scenario data · no live air-quality monitors are connected. Use the controls below to explore changes.
+      </p>
       {/* ============================================================
           TOP HERO KPI BANNER (Elite Typography & Modern Dashboard Layout)
           ============================================================ */}
@@ -67,8 +70,7 @@ export const AirTelemetryDashboard = memo(function AirTelemetryDashboard() {
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 text-xs">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 shadow-2xs">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-500" />
               </span>
               <span className="font-mono font-bold tracking-wider text-[11px] uppercase">
                 Station [STN-{currentZone.zoneId.replace('Z-', '')}]
@@ -85,7 +87,7 @@ export const AirTelemetryDashboard = memo(function AirTelemetryDashboard() {
             <span className="text-slate-400 dark:text-slate-600 hidden sm:inline">•</span>
 
             <span className="text-[11px] text-slate-800 dark:text-slate-200 font-mono font-bold">
-              Synced: {new Date(currentZone.lastUpdated).toLocaleTimeString()}
+              Scenario updated: {new Date(currentZone.lastUpdated).toLocaleTimeString()}
             </span>
           </div>
 
@@ -162,10 +164,10 @@ export const AirTelemetryDashboard = memo(function AirTelemetryDashboard() {
           <div>
             <h2 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" aria-hidden="true" />
-              Monitored Urban Sectors ({zones.length})
+              Demo City Sectors ({zones.length})
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Click any sector to focus telemetry across the spatial monitoring mesh
+              Select a scenario sector to explore the illustrative readings
             </p>
           </div>
 

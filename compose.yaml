@@ -1,0 +1,27 @@
+services:
+  breatheway:
+    build:
+      context: .
+    ports:
+      - "${PORT:-3001}:3001"
+    environment:
+      NODE_ENV: production
+      PORT: "3001"
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+      CORS_ORIGINS: "${CORS_ORIGINS:-}"
+    init: true
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3001/api/health').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s

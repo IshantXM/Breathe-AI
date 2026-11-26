@@ -18,6 +18,16 @@ Open `http://localhost:3001`. For development, run `npm run server:dev` and `npm
 
 For optional Gemini drafts, copy `.env.example` to `.env` and configure `GEMINI_API_KEY` on the **server only**. A static host does not run Express: provide a separately deployed backend with `VITE_API_BASE_URL` at build time and allow the exact frontend origin in the backend's `CORS_ORIGINS`, or use the key-free browser fallback. For a reverse proxy where the public HTTPS origin differs from the backend origin, include that exact public origin too.
 
+## Run with Docker
+
+Build and start the production frontend and API together (Docker Engine with the Compose plugin is required):
+
+```sh
+docker compose up --build
+```
+
+Open `http://localhost:3001`; set `PORT` in a root `.env` file to change the host port. Gemini is optional: set `GEMINI_API_KEY` in that `.env` file to enable AI drafts; without it, the app uses its rule-based fallback. Set `CORS_ORIGINS` only when allowing additional exact origins. Stop the container with `docker compose down`.
+
 ## A 90-second judge walkthrough
 
 > “Most air-quality tools tell us how bad the air is. BreatheWay shows how that information could change a family's day.”
